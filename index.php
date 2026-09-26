@@ -82,7 +82,6 @@ if ($role == 'Admin') {
 
 if ($role == 'Petugas Lab') {
 
-    // Barang yang kondisinya bukan Baik
     $q = mysqli_query($koneksi,
         "SELECT COUNT(*) AS total
          FROM barang
@@ -90,7 +89,6 @@ if ($role == 'Petugas Lab') {
     );
     $perlu_dicek = mysqli_fetch_assoc($q)['total'];
 
-    // Barang habis
     $q = mysqli_query($koneksi,
         "SELECT COUNT(*) AS total
          FROM barang
@@ -98,7 +96,6 @@ if ($role == 'Petugas Lab') {
     );
     $barang_habis = mysqli_fetch_assoc($q)['total'];
 
-    // Kembali hari ini
     $q = mysqli_query($koneksi,
         "SELECT COUNT(*) AS total
          FROM peminjaman
@@ -107,7 +104,6 @@ if ($role == 'Petugas Lab') {
     );
     $kembali_hari_ini = mysqli_fetch_assoc($q)['total'];
 
-    // Terlambat
     $q = mysqli_query($koneksi,
         "SELECT COUNT(*) AS total
          FROM peminjaman
@@ -116,7 +112,6 @@ if ($role == 'Petugas Lab') {
     );
     $terlambat = mysqli_fetch_assoc($q)['total'];
 
-    // Barang yang sedang dipinjam
     $barang_dipinjam = mysqli_query($koneksi,
         "SELECT COUNT(*) AS total
          FROM detail_peminjaman dp
@@ -148,6 +143,9 @@ if ($role == 'Siswa') {
     $jumlah_pinjam =
         mysqli_fetch_assoc($q)['total'];
 
+
+    /* PEMINJAMAN SISWA */
+
     $pinjaman_saya = mysqli_query($koneksi,
         "SELECT
             p.id_peminjaman,
@@ -172,6 +170,9 @@ if ($role == 'Siswa') {
         GROUP BY p.id_peminjaman
         ORDER BY p.tanggal_rencana_kembali ASC"
     );
+
+
+    /* BARANG TERSEDIA */
 
     $barang_tersedia = mysqli_query($koneksi,
         "SELECT *
@@ -201,7 +202,6 @@ if ($role == 'Siswa') {
 </head>
 
 <body>
-
 
 <!-- =====================================================
      NAVBAR
@@ -255,7 +255,7 @@ if ($role == 'Siswa') {
             </a>
 
             <a href="peminjaman.php">
-                Peminjaman
+                Peminjaman Saya
             </a>
 
             <a href="pengembalian.php">
@@ -355,9 +355,7 @@ if ($role == 'Siswa') {
 
             <h3>📦 Total Barang</h3>
 
-            <h1>
-                <?= $total_barang ?>
-            </h1>
+            <h1><?= $total_barang ?></h1>
 
         </div>
 
@@ -365,9 +363,7 @@ if ($role == 'Siswa') {
 
             <h3>👨‍🎓 Total Siswa</h3>
 
-            <h1>
-                <?= $total_siswa ?>
-            </h1>
+            <h1><?= $total_siswa ?></h1>
 
         </div>
 
@@ -375,9 +371,7 @@ if ($role == 'Siswa') {
 
             <h3>🧑‍🔧 Total Petugas</h3>
 
-            <h1>
-                <?= $total_petugas ?>
-            </h1>
+            <h1><?= $total_petugas ?></h1>
 
         </div>
 
@@ -385,9 +379,7 @@ if ($role == 'Siswa') {
 
             <h3>📋 Total Transaksi</h3>
 
-            <h1>
-                <?= $total_transaksi ?>
-            </h1>
+            <h1><?= $total_transaksi ?></h1>
 
         </div>
 
@@ -428,64 +420,43 @@ if ($role == 'Siswa') {
 
             $no = 1;
 
-            while (
-                $data =
-                mysqli_fetch_assoc(
-                    $siswa_meminjam
-                )
-            ) {
+            while ($data = mysqli_fetch_assoc($siswa_meminjam)) {
 
             ?>
 
                 <tr>
 
-                    <td>
-                        <?= $no++ ?>
-                    </td>
+                    <td><?= $no++ ?></td>
 
                     <td>
-                        <?= htmlspecialchars(
-                            $data['nis']
-                        ) ?>
+                        <?= htmlspecialchars($data['nis']) ?>
                     </td>
 
                     <td>
                         <b>
-                            <?= htmlspecialchars(
-                                $data['nama_siswa']
-                            ) ?>
+                            <?= htmlspecialchars($data['nama_siswa']) ?>
                         </b>
                     </td>
 
                     <td>
-                        <?= htmlspecialchars(
-                            $data['kelas']
-                        ) ?>
+                        <?= htmlspecialchars($data['kelas']) ?>
                     </td>
 
                     <td>
-                        <?= htmlspecialchars(
-                            $data['barang']
+                        <?= htmlspecialchars($data['barang']) ?>
+                    </td>
+
+                    <td>
+                        <?= date(
+                            'd-m-Y',
+                            strtotime($data['tanggal_pinjam'])
                         ) ?>
                     </td>
 
                     <td>
                         <?= date(
                             'd-m-Y',
-                            strtotime(
-                                $data['tanggal_pinjam']
-                            )
-                        ) ?>
-                    </td>
-
-                    <td>
-                        <?= date(
-                            'd-m-Y',
-                            strtotime(
-                                $data[
-                                    'tanggal_rencana_kembali'
-                                ]
-                            )
+                            strtotime($data['tanggal_rencana_kembali'])
                         ) ?>
                     </td>
 
@@ -548,15 +519,11 @@ if ($role == 'Siswa') {
     </div>
 
 
-    <!-- STATISTIK PETUGAS -->
-
     <div class="grid">
 
         <div class="stat">
 
-            <h3>
-                💻 Sedang Dipinjam
-            </h3>
+            <h3>💻 Sedang Dipinjam</h3>
 
             <h1>
                 <?= $total_barang_dipinjam ?>
@@ -567,9 +534,7 @@ if ($role == 'Siswa') {
 
         <div class="stat">
 
-            <h3>
-                🔎 Kondisi Perlu Dicek
-            </h3>
+            <h3>🔎 Kondisi Perlu Dicek</h3>
 
             <h1>
                 <?= $perlu_dicek ?>
@@ -580,9 +545,7 @@ if ($role == 'Siswa') {
 
         <div class="stat">
 
-            <h3>
-                ⏰ Kembali Hari Ini
-            </h3>
+            <h3>⏰ Kembali Hari Ini</h3>
 
             <h1>
                 <?= $kembali_hari_ini ?>
@@ -593,9 +556,7 @@ if ($role == 'Siswa') {
 
         <div class="stat">
 
-            <h3>
-                ⚠️ Terlambat
-            </h3>
+            <h3>⚠️ Terlambat</h3>
 
             <h1>
                 <?= $terlambat ?>
@@ -605,8 +566,6 @@ if ($role == 'Siswa') {
 
     </div>
 
-
-    <!-- PEKERJAAN PETUGAS -->
 
     <div class="card">
 
@@ -638,14 +597,9 @@ if ($role == 'Siswa') {
 
             <tbody>
 
-
-                <!-- CEK KONDISI -->
-
                 <tr>
 
-                    <td>
-                        1
-                    </td>
+                    <td>1</td>
 
                     <td>
                         🔎
@@ -656,9 +610,7 @@ if ($role == 'Siswa') {
 
                     <td>
                         Mengecek barang yang
-                        sedang dipinjam, siapa
-                        yang meminjam, serta
-                        kondisi barang.
+                        sedang dipinjam.
                     </td>
 
                     <td>
@@ -675,13 +627,9 @@ if ($role == 'Siswa') {
                 </tr>
 
 
-                <!-- PANTAU PEMINJAMAN -->
-
                 <tr>
 
-                    <td>
-                        2
-                    </td>
+                    <td>2</td>
 
                     <td>
                         👀
@@ -709,13 +657,9 @@ if ($role == 'Siswa') {
                 </tr>
 
 
-                <!-- PENGEMBALIAN -->
-
                 <tr>
 
-                    <td>
-                        3
-                    </td>
+                    <td>3</td>
 
                     <td>
                         🔄
@@ -742,15 +686,12 @@ if ($role == 'Siswa') {
 
                 </tr>
 
-
             </tbody>
 
         </table>
 
     </div>
 
-
-    <!-- INFORMASI KERJA PETUGAS -->
 
     <div class="card">
 
@@ -816,8 +757,7 @@ if ($role == 'Siswa') {
 
                 <p>
                     Setelah barang dikembalikan,
-                    periksa kondisinya sebelum
-                    barang digunakan kembali.
+                    periksa kondisinya.
                 </p>
 
             </div>
@@ -869,17 +809,17 @@ if ($role == 'Siswa') {
     </div>
 
 
+    <!-- =================================================
+         PINJAMAN SAYA
+    ================================================== -->
+
     <div class="card">
 
         <h3>
             📋 Pinjaman Saya
         </h3>
 
-        <?php if (
-            mysqli_num_rows(
-                $pinjaman_saya
-            ) > 0
-        ) { ?>
+        <?php if (mysqli_num_rows($pinjaman_saya) > 0) { ?>
 
             <table>
 
@@ -903,12 +843,7 @@ if ($role == 'Siswa') {
 
                 $no = 1;
 
-                while (
-                    $data =
-                    mysqli_fetch_assoc(
-                        $pinjaman_saya
-                    )
-                ) {
+                while ($data = mysqli_fetch_assoc($pinjaman_saya)) {
 
                 ?>
 
@@ -920,31 +855,21 @@ if ($role == 'Siswa') {
 
                         <td>
                             <b>
-                                <?= htmlspecialchars(
-                                    $data['barang']
-                                ) ?>
+                                <?= htmlspecialchars($data['barang']) ?>
                             </b>
                         </td>
 
                         <td>
                             <?= date(
                                 'd-m-Y',
-                                strtotime(
-                                    $data[
-                                        'tanggal_pinjam'
-                                    ]
-                                )
+                                strtotime($data['tanggal_pinjam'])
                             ) ?>
                         </td>
 
                         <td>
                             <?= date(
                                 'd-m-Y',
-                                strtotime(
-                                    $data[
-                                        'tanggal_rencana_kembali'
-                                    ]
-                                )
+                                strtotime($data['tanggal_rencana_kembali'])
                             ) ?>
                         </td>
 
@@ -980,10 +905,10 @@ if ($role == 'Siswa') {
                 <br><br>
 
                 <a
-                    href="peminjaman.php"
+                    href="barang.php"
                     class="btn"
                 >
-                    📦 Pinjam Barang
+                    📦 Pilih Barang
                 </a>
 
             </div>
@@ -992,6 +917,10 @@ if ($role == 'Siswa') {
 
     </div>
 
+
+    <!-- =================================================
+         BARANG TERSEDIA
+    ================================================== -->
 
     <div class="card">
 
@@ -1022,12 +951,7 @@ if ($role == 'Siswa') {
 
             $no = 1;
 
-            while (
-                $data =
-                mysqli_fetch_assoc(
-                    $barang_tersedia
-                )
-            ) {
+            while ($data = mysqli_fetch_assoc($barang_tersedia)) {
 
             ?>
 
@@ -1039,16 +963,12 @@ if ($role == 'Siswa') {
 
                     <td>
                         <b>
-                            <?= htmlspecialchars(
-                                $data['nama_barang']
-                            ) ?>
+                            <?= htmlspecialchars($data['nama_barang']) ?>
                         </b>
                     </td>
 
                     <td>
-                        <?= htmlspecialchars(
-                            $data['jenis_barang']
-                        ) ?>
+                        <?= htmlspecialchars($data['jenis_barang']) ?>
                     </td>
 
                     <td>
@@ -1056,15 +976,19 @@ if ($role == 'Siswa') {
                     </td>
 
                     <td>
-                        <?= htmlspecialchars(
-                            $data['kondisi']
-                        ) ?>
+                        <?= htmlspecialchars($data['kondisi']) ?>
                     </td>
 
                     <td>
 
+                        <!--
+                            PENTING:
+                            JANGAN arahkan ke peminjaman.php.
+                            Arahkan ke FORM PEMINJAMAN.
+                        -->
+
                         <a
-                            href="peminjaman.php?barang=<?= $data['id_barang'] ?>"
+                            href="form_peminjaman.php?id_barang=<?= $data['id_barang'] ?>"
                             class="btn"
                         >
                             📥 Pinjam
